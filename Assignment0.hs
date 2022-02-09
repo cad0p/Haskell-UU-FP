@@ -1,3 +1,6 @@
 module Main where
 main :: IO ()
-main = putStrLn "Hello, world!"
+-- 2
+-- main = putStrLn "Hello, world!"
+-- 3 Interaction with the outside world
+main = interact reverse
