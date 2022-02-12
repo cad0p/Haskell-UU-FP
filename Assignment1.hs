@@ -42,8 +42,9 @@ printField w c = formatField (isFieldNumerical c) w c
   
 formatField :: Bool -> Width -> String -> Field
 -- left aligned
-formatField False w c = concat (c : replicate w " ")
-formatField True  w c = concat (replicate w " " ++ [c])
+formatField False w c = concat (c : replicate (w - length c) " ")
+-- right aligned
+formatField True  w c = concat (replicate (w - length c) " " ++ [c])
 
 
 main = putStrLn (printLine [5, 6, 6, 6])
