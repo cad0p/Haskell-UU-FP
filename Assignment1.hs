@@ -2,7 +2,7 @@
 module Main where
 
 import           Data.Char                      ( isDigit )
-import           Data.List                      ( intercalate )
+import           Data.List                      ( intercalate, transpose )
 
 main :: IO ()
 
@@ -33,7 +33,7 @@ printLine = wrapPlus . intercalate "+" . map replicateL
   otherwise it should be left-aligned.
 -}
 printField
-  :: Int      -- ^ desired width for the field
+  :: Width      -- ^ desired width for the field
   -> String   -- ^ contents of the field
   -> String   -- ^ formatted field
 printField w c = formatField (isFieldNumerical c) w c
@@ -56,8 +56,17 @@ formatField True  w c = concat (replicate (w - length c) " " ++ [c])
   should return the formatted row
   "|Alice|Allen |female| 82000|"
 -}
-printRow :: [(Int, String)] -> String 
+printRow :: [(Width, String)] -> String 
 printRow = intercalate "|" . map (uncurry printField)
 
+{-|
+  given a table, computes the necessary widths
+  of all the columns
+-}
+columnWidths :: Table -> [Width]
+-- columns become rows; for each row, get the length of each field
+-- and get the maximum of these lengths
+columnWidths = map (maximum . map length) . transpose
 
-main = putStrLn (printLine [5, 6, 6, 6])
+
+main = interact (unlines . map show . columnWidths . parseTable)
