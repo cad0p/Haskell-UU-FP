@@ -46,5 +46,18 @@ formatField False w c = concat (c : replicate (w - length c) " ")
 -- right aligned
 formatField True  w c = concat (replicate (w - length c) " " ++ [c])
 
+{-|
+  Write a function printRow :: [ (Int, String)] → String 
+  that, given a list of pairs
+  —the left element giving the desired length of a field 
+  and the right element its contents—
+  formats one row in the table. For example,
+  printRow [(5, "Alice"),(6, "Allen"),(6, "female"),(6, "82000")]
+  should return the formatted row
+  "|Alice|Allen |female| 82000|"
+-}
+printRow :: [(Int, String)] -> String 
+printRow = intercalate "|" . map (uncurry printField)
+
 
 main = putStrLn (printLine [5, 6, 6, 6])
