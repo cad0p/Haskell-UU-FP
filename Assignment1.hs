@@ -1,7 +1,7 @@
 -- Assignment 1: Lists
 module Main where
 
-import           Data.Char                      ( isDigit )
+import           Data.Char                      ( isDigit, toUpper )
 import           Data.List                      ( intercalate, transpose )
 
 main :: IO ()
@@ -33,7 +33,7 @@ printLine = wrapPlus . intercalate "+" . map replicateL
   otherwise it should be left-aligned.
 -}
 printField
-  :: Width      -- ^ desired width for the field
+  :: Width    -- ^ desired width for the field
   -> String   -- ^ contents of the field
   -> String   -- ^ formatted field
 printField w c = formatField (isFieldNumerical c) w c
@@ -56,8 +56,8 @@ formatField True  w c = concat (replicate (w - length c) " " ++ [c])
   should return the formatted row
   "|Alice|Allen |female| 82000|"
 -}
-printRow :: [(Width, String)] -> String 
-printRow = intercalate "|" . map (uncurry printField)
+printRow :: [(Width, Field)] -> String 
+printRow = wrapWith "|" . intercalate "|" . map (uncurry printField)
 
 {-|
   given a table, computes the necessary widths
@@ -68,5 +68,22 @@ columnWidths :: Table -> [Width]
 -- and get the maximum of these lengths
 columnWidths = map (maximum . map length) . transpose
 
+{-|
+  pretty prints the whole table as a list of lines
+-}
+printTable :: Table -> [String]
+printTable t = printHeader(columnWidths t) ++ printRows(columnWidths t)
+  where printHeader x = [ 
+          printLine x, 
+          map toUpper(printRow(zip (columnWidths t) (head t))), 
+          printLine x ]
+        printRows x = [printLine x]
 
-main = interact (unlines . map show . columnWidths . parseTable)
+wrapWith :: 
+     String -- ^ the wrap
+  -> String -- ^ the string
+  -> String -- ^ the wrapped string
+wrapWith w s = w ++ s ++ w
+
+
+main = interact (unlines . printTable . parseTable)
