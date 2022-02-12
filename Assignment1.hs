@@ -68,16 +68,38 @@ columnWidths :: Table -> [Width]
 -- and get the maximum of these lengths
 columnWidths = map (maximum . map length) . transpose
 
+type Index = Int
+
 {-|
   pretty prints the whole table as a list of lines
 -}
 printTable :: Table -> [String]
-printTable t = printHeader(columnWidths t) ++ printRows(columnWidths t)
-  where printHeader x = [ 
-          printLine x, 
-          map toUpper(printRow(zip (columnWidths t) (head t))), 
-          printLine x ]
-        printRows x = [printLine x]
+-- printTable t = printHeader(columnWidths t) ++ printRows(columnWidths t)
+--   where printHeader x = [ 
+--           printLine x, 
+--           map toUpper(printRow(zip (columnWidths t) (head t))), 
+--           printLine x ]
+--         printRows x = [printLine x]
+-- you have a list of lists, so you concat to get a list
+-- because each row can generate multiple prettified rows
+printTable t = concat (mapInd prettyPrintRow t)
+  where ws = columnWidths t
+        lt = length t
+        prettyPrintRow :: Index -> Row -> [String]
+        -- header row
+        prettyPrintRow 0 r = [
+          printLine ws,
+          map toUpper(printRow(zip ws r)),
+          printLine ws]
+        -- /= means not!
+        prettyPrintRow i r = filter (/= "") [
+          printRow(zip ws r),
+          if i == lt - 1 then printLine ws else ""]
+
+-- variant of map that passes each element's index as the first argument of f
+-- https://stackoverflow.com/questions/16191824/index-of-element-in-list-in-haskell
+mapInd :: (Index -> a -> b) -> [a] -> [b]
+mapInd f = zipWith f [0..]
 
 wrapWith :: 
      String -- ^ the wrap
