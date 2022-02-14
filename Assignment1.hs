@@ -1,8 +1,12 @@
 -- Assignment 1: Lists
 module Main where
 
-import           Data.Char                      ( isDigit, toUpper )
-import           Data.List                      ( intercalate, transpose )
+import           Data.Char                      ( isDigit
+                                                , toUpper
+                                                )
+import           Data.List                      ( intercalate
+                                                , transpose
+                                                )
 
 main :: IO ()
 
@@ -37,9 +41,8 @@ printField
   -> String   -- ^ contents of the field
   -> String   -- ^ formatted field
 printField w c = formatField (isFieldNumerical c) w c
- where
-  isFieldNumerical = all isDigit
-  
+  where isFieldNumerical = all isDigit
+
 formatField :: Bool -> Width -> String -> Field
 -- left aligned
 formatField False w c = concat (c : replicate (w - length c) " ")
@@ -56,7 +59,7 @@ formatField True  w c = concat (replicate (w - length c) " " ++ [c])
   should return the formatted row
   "|Alice|Allen |female| 82000|"
 -}
-printRow :: [(Width, Field)] -> String 
+printRow :: [(Width, Field)] -> String
 printRow = wrapWith "|" . intercalate "|" . map (uncurry printField)
 
 {-|
@@ -83,26 +86,25 @@ printTable :: Table -> [String]
 -- you have a list of lists, so you concat to get a list
 -- because each row can generate multiple prettified rows
 printTable t = concat (mapInd prettyPrintRow t)
-  where ws = columnWidths t
-        lt = length t
-        prettyPrintRow :: Index -> Row -> [String]
-        -- header row
-        prettyPrintRow 0 r = [
-          printLine ws,
-          map toUpper(printRow(zip ws r)),
-          printLine ws]
-        -- /= means not!
-        prettyPrintRow i r = filter (/= "") [
-          printRow(zip ws r),
-          if i == lt - 1 then printLine ws else ""]
+ where
+  ws = columnWidths t
+  lt = length t
+  prettyPrintRow :: Index -> Row -> [String]
+  -- header row
+  prettyPrintRow 0 r =
+    [printLine ws, map toUpper (printRow (zip ws r)), printLine ws]
+  -- /= means not!
+  prettyPrintRow i r = filter
+    (/= "")
+    [printRow (zip ws r), if i == lt - 1 then printLine ws else ""]
 
 -- variant of map that passes each element's index as the first argument of f
 -- https://stackoverflow.com/questions/16191824/index-of-element-in-list-in-haskell
 mapInd :: (Index -> a -> b) -> [a] -> [b]
-mapInd f = zipWith f [0..]
+mapInd f = zipWith f [0 ..]
 
-wrapWith :: 
-     String -- ^ the wrap
+wrapWith
+  :: String -- ^ the wrap
   -> String -- ^ the string
   -> String -- ^ the wrapped string
 wrapWith w s = w ++ s ++ w
